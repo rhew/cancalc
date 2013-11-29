@@ -18,6 +18,7 @@ function buildCanTable()
     }
 
     $(function() {
+        $('#canTableDiv').append("<table id=\"canTable\"><tbody></tbody></table>");
         $('#canTable').dataTable({
             "bSort": false,
             "aaData" : canData,
