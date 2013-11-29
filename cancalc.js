@@ -15,10 +15,7 @@ function canstructionDiameter(canType, count)
     return 2 * (centerToCanCenter + radius);
 }
 
-function buildCanTable()
-{
-    var canTypes = ['202', '300', '303'];
-
+function buildCanDataSets(canTypes) {
     var canDataSets = [];
     canTypes.forEach(function(canType) {
         canDataSets[canType] = [];
@@ -26,32 +23,45 @@ function buildCanTable()
             canDataSets[canType].push([i, canstructionDiameter(canType, i).toFixed(1)]);
         }
     });
+    return canDataSets;
+}
+
+function addForwardReferencesForTabs(el, canDataSets) {
+    // tabs require a list with forward references to each tab div
+    $(el).append('<ul id="canTabList"></ul>');
+    Object.keys(canDataSets).forEach(function(canType) {
+        var divId = 'canTab-' + canType;
+        $('#canTabList').append(
+            '<li><a href="#' + divId +
+            '">Circle of #' + canType + ' cans</a></li>');
+    });
+}
+
+function addCanTableTab(el, canType, canDataSets) {
+    var divId = 'canTab-' + canType;
+    var tableId = 'canTable-' + canType;
+    $('#canTabs').append('<div id="' + divId + '"></div>');
+    $('#' + divId).append(
+        "<table id=\"" + tableId + "\"><tbody></tbody></table>"
+    );
+    $('#' + tableId).dataTable({
+        "bSort": false,
+        "aaData" : canDataSets[canType],
+        "aoColumns" : [
+            {"sTitle": "# of cans"},
+            {"sTitle": "diameter"},
+        ]
+    });
+}
+
+function buildCanTable()
+{
+    var canDataSets = buildCanDataSets(['202', '300', '303']);
 
     $(function() {
-        // tabs require a list with forward references to each tab div
-        $('#canTabs').append('<ul id="canTabList"></ul>');
+        addForwardReferencesForTabs('#canTabs', canDataSets);
         Object.keys(canDataSets).forEach(function(canType) {
-            var divId = 'canTab-' + canType;
-            $('#canTabList').append(
-                '<li><a href="#' + divId +
-                '">Circle of #' + canType + ' cans</a></li>');
-        });
-
-        Object.keys(canDataSets).forEach(function(canType) {
-            var divId = 'canTab-' + canType;
-            var tableId = 'canTable-' + canType;
-            $('#canTabs').append('<div id="' + divId + '"></div>');
-            $('#' + divId).append(
-                "<table id=\"" + tableId + "\"><tbody></tbody></table>"
-            );
-            $('#' + tableId).dataTable({
-                "bSort": false,
-                "aaData" : canDataSets[canType],
-                "aoColumns" : [
-                    {"sTitle": "# of cans"},
-                    {"sTitle": "diameter"},
-                ]
-            });
+            addCanTableTab('#canTabs', canType, canDataSets);
         });
         $('#canTabs').tabs();
     });
