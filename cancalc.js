@@ -54,6 +54,16 @@ function addCanTableTab(el, canType, canDataSets) {
     });
 }
 
+function drawCan(context, x, y, radius) {
+            context.beginPath();
+            context.arc(x, y, radius, 0, 2 * Math.PI, false);
+            context.fillStyle = 'silver';
+            context.fill();
+            context.lineWidth = 5;
+            context.strokeStyle = 'grey';
+            context.stroke();
+}
+
 function handleCanDrawing(canvas) {
     if (canvas.getContext) {
         var context = canvas.getContext('2d');
@@ -62,26 +72,12 @@ function handleCanDrawing(canvas) {
         
         function resizeCanvas() {
                 canvas.width = window.innerWidth;
-                
                 drawCans(); 
         }
         resizeCanvas();
         
         function drawCans() {
-            var radius = 70;
-
-            context.beginPath();
-            context.arc(canvas.width / 2,
-                canvas.height / 2,
-                radius,
-                0,
-                2 * Math.PI,
-                false);
-            context.fillStyle = 'silver';
-            context.fill();
-            context.lineWidth = 5;
-            context.strokeStyle = 'grey';
-            context.stroke();
+            drawCan(context, canvas.width / 2, canvas.height / 2, 70);
         }
     }
 }
