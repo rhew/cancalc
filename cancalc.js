@@ -13,18 +13,17 @@ function buildCanTable()
     var canData = [];
 
     for (var i = 3; i<=100; i++) {
-        canData.push({
-            'canCount' : i,
-            'diameter' : canstructionDiameter(i).toFixed(1)
-        });
+        canData.push([i, canstructionDiameter(i).toFixed(1)]);
     }
 
     $(function() {
-        $.each(canData, function(i, rowData) {
-            $('<tr>').append(
-                $('<td>').text(rowData.canCount),
-                $('<td>').text(rowData.diameter)
-            ).appendTo('#canTbody');
+        $('#canTable').dataTable({
+            "bSort": false,
+            "aaData" : canData,
+            "aoColumns" : [
+                {"sTitle": "# of cans"},
+                {"sTitle": "diameter"},
+            ]
         });
     });
 };
