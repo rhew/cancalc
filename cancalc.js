@@ -56,7 +56,7 @@ function addCanTableTab(el, canType, canDataSets) {
 
 function buildCanTable()
 {
-    var canDataSets = buildCanDataSets(['202', '300', '303']);
+    var canDataSets = buildCanDataSets(['202', '300', '303', '603']);
 
     $(function() {
         addForwardReferencesForTabs('#canTabs', canDataSets);
