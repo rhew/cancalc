@@ -60,12 +60,12 @@ function drawCan(context, x, y, radius, label) {
     context.fillStyle = 'silver';
     context.fill();
 
-    context.lineWidth = 5;
+    context.lineWidth = 1;
     context.strokeStyle = 'grey';
     context.stroke();
 
     context.fillStyle = 'black';
-    context.font="20px Arial";
+    context.font="8px Arial";
     context.textAlign="center";
     context.textBaseline="middle";
     context.fillText(label, x, y);
@@ -76,27 +76,25 @@ function handleCanDrawing(canvas, canDataSets) {
         var context = canvas.getContext('2d');
 
         window.addEventListener('resize', resizeCanvas, false);
-        
+
         function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                drawCans(); 
+            canvas.width = window.innerWidth;
+            drawCans(); 
         }
+
         resizeCanvas();
         
         function drawCans() {
             canTypes = Object.keys(canDataSets);
             canType = canTypes[1];
-            drawCan(
-                context,
-                canvas.width / 2,
-                canvas.height / 2,
-                70,
-                '#' + canType);
+            var centerX = 120;
+            var centerY = canvas.height / 2;
+            drawCan(context, centerX, centerY, canTypeToInches(canType) / 2 * 10, '#' + canType);
         }
     }
 }
 
-function buildCanTable()
+function renderCanCalc()
 {
     var canDataSets = buildCanDataSets(['202', '300', '303', '603']);
 
@@ -107,7 +105,7 @@ function buildCanTable()
         });
         $('#canTabs').tabs();
 
-        handleCanDrawing(document.getElementById('canDrawing'), canDataSets);
+        handleCanDrawing(document.getElementById('canCalcCanvas'), canDataSets);
 
     });
 };
