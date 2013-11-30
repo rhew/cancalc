@@ -54,17 +54,24 @@ function addCanTableTab(el, canType, canDataSets) {
     });
 }
 
-function drawCan(context, x, y, radius) {
-            context.beginPath();
-            context.arc(x, y, radius, 0, 2 * Math.PI, false);
-            context.fillStyle = 'silver';
-            context.fill();
-            context.lineWidth = 5;
-            context.strokeStyle = 'grey';
-            context.stroke();
+function drawCan(context, x, y, radius, label) {
+    context.beginPath();
+    context.arc(x, y, radius, 0, 2 * Math.PI, false);
+    context.fillStyle = 'silver';
+    context.fill();
+
+    context.lineWidth = 5;
+    context.strokeStyle = 'grey';
+    context.stroke();
+
+    context.fillStyle = 'black';
+    context.font="20px Arial";
+    context.textAlign="center";
+    context.textBaseline="middle";
+    context.fillText(label, x, y);
 }
 
-function handleCanDrawing(canvas) {
+function handleCanDrawing(canvas, canDataSets) {
     if (canvas.getContext) {
         var context = canvas.getContext('2d');
 
@@ -77,7 +84,14 @@ function handleCanDrawing(canvas) {
         resizeCanvas();
         
         function drawCans() {
-            drawCan(context, canvas.width / 2, canvas.height / 2, 70);
+            canTypes = Object.keys(canDataSets);
+            canType = canTypes[1];
+            drawCan(
+                context,
+                canvas.width / 2,
+                canvas.height / 2,
+                70,
+                '#' + canType);
         }
     }
 }
@@ -93,6 +107,7 @@ function buildCanTable()
         });
         $('#canTabs').tabs();
 
-        handleCanDrawing(document.getElementById('canDrawing'));
+        handleCanDrawing(document.getElementById('canDrawing'), canDataSets);
+
     });
 };
