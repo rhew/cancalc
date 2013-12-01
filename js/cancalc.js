@@ -33,35 +33,36 @@ function drawCan(context, x, y, radius, label) {
     context.fillText(label, x, y);
 }
 
+function drawCans(context, x, y, canType, canCount) {
+    var canRadius = canTypeToInches(canType) / 2;
+    var canRenderRadius = canRadius * 10;
+    var circleRenderRadius = centerToCanCenter(canRadius, canCount) * 10;
+
+    for (angle = 0; angle < (2 * Math.PI); angle += (2 * Math.PI / canCount)) {
+        drawCan(
+            context,
+            x + circleRenderRadius * Math.sin(angle),
+            y + circleRenderRadius * Math.cos(angle),
+            canRenderRadius,
+            '#' + canType);
+    }
+}
+
 function handleCanDrawing(canvas) {
     if (canvas.getContext) {
         var context = canvas.getContext('2d');
+
+        var centerX = 120;
+        var centerY = canvas.height / 2;
 
         window.addEventListener('resize', resizeCanvas, false);
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
-            drawCans("300", 16); 
+            drawCans(context, centerX, centerY, "300", 16); 
         }
 
         resizeCanvas();
-        
-        function drawCans(canType, canCount) {
-            var canRadius = canTypeToInches(canType) / 2;
-            var canRenderRadius = canRadius * 10;
-            var circleRenderRadius = centerToCanCenter(canRadius, canCount) * 10;
-
-            var centerX = 120;
-            var centerY = canvas.height / 2;
-            for (angle = 0; angle < (2 * Math.PI); angle += (2 * Math.PI / canCount)) {
-                drawCan(
-                    context,
-                    centerX + circleRenderRadius * Math.sin(angle),
-                    centerY + circleRenderRadius * Math.cos(angle),
-                    canRenderRadius,
-                    '#' + canType);
-            }
-        }
     }
 }
 
