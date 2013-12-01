@@ -1,3 +1,5 @@
+var inchesToPx = 10;
+
 function canTypeToInches(canType)
 {
     var inches = Number(canType.substring(0,1));
@@ -27,7 +29,7 @@ function drawCan(context, x, y, radius, label) {
     context.stroke();
 
     context.fillStyle = 'black';
-    context.font="8px Arial";
+    context.font= 1 * inchesToPx + "px Arial";
     context.textAlign="center";
     context.textBaseline="middle";
     context.fillText(label, x, y);
@@ -35,8 +37,8 @@ function drawCan(context, x, y, radius, label) {
 
 function drawCans(context, x, y, canType, canCount) {
     var canRadius = canTypeToInches(canType) / 2;
-    var canRenderRadius = canRadius * 10;
-    var circleRenderRadius = centerToCanCenter(canRadius, canCount) * 10;
+    var canRenderRadius = canRadius * inchesToPx;
+    var circleRenderRadius = centerToCanCenter(canRadius, canCount) * inchesToPx;
 
     for (angle = 0; angle < (2 * Math.PI); angle += (2 * Math.PI / canCount)) {
         drawCan(
@@ -52,7 +54,7 @@ function handleCanDrawing(canvas) {
     if (canvas.getContext) {
         var context = canvas.getContext('2d');
 
-        var centerX = 120;
+        var centerX = 12 * inchesToPx;
         var centerY = canvas.height / 2;
 
         window.addEventListener('resize', resizeCanvas, false);
