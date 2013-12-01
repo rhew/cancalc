@@ -5,14 +5,16 @@ function canTypeToInches(canType)
     return inches + sixteenths / 16;
 }
 
+function centerToCanCenter(canRadius, count) {
+    return Math.sin((Math.PI - 2 * Math.PI / count ) / 2)
+        * 2 * canRadius / Math.sin(2 * Math.PI / count);
+}
+
 function canstructionDiameter(canType, count)
 {
     radius = canTypeToInches(canType) / 2;
 
-    var centerToCanCenter = Math.sin((Math.PI - 2 * Math.PI / count ) / 2)
-        * 2 * radius / Math.sin(2 * Math.PI / count);
-
-    return 2 * (centerToCanCenter + radius);
+    return 2 * (centerToCanCenter(radius, count) + radius);
 }
 
 function buildCanDataSets(canTypes) {
@@ -71,7 +73,7 @@ function drawCan(context, x, y, radius, label) {
     context.fillText(label, x, y);
 }
 
-function handleCanDrawing(canvas, canDataSets) {
+function handleCanDrawing(canvas) {
     if (canvas.getContext) {
         var context = canvas.getContext('2d');
 
@@ -79,17 +81,26 @@ function handleCanDrawing(canvas, canDataSets) {
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
-            drawCans(); 
+            drawCans("300", 16); 
         }
 
         resizeCanvas();
         
-        function drawCans() {
-            canTypes = Object.keys(canDataSets);
-            canType = canTypes[1];
+        function drawCans(canType, canCount) {
+            var canRadius = canTypeToInches(canType) / 2;
+            var canRenderRadius = canRadius * 10;
+            var circleRenderRadius = centerToCanCenter(canRadius, canCount) * 10;
+
             var centerX = 120;
             var centerY = canvas.height / 2;
-            drawCan(context, centerX, centerY, canTypeToInches(canType) / 2 * 10, '#' + canType);
+            for (angle = 0; angle < (2 * Math.PI); angle += (2 * Math.PI / canCount)) {
+                drawCan(
+                    context,
+                    centerX + circleRenderRadius * Math.sin(angle),
+                    centerY + circleRenderRadius * Math.cos(angle),
+                    canRenderRadius,
+                    '#' + canType);
+            }
         }
     }
 }
@@ -105,7 +116,7 @@ function renderCanCalc()
         });
         $('#canTabs').tabs();
 
-        handleCanDrawing(document.getElementById('canCalcCanvas'), canDataSets);
+        handleCanDrawing(document.getElementById('canCalcCanvas'));
 
     });
 };
