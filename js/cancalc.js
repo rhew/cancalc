@@ -18,59 +18,63 @@ function canstructionDiameter(canType, count)
     return 2 * (centerToCanCenter(radius, count) + radius);
 }
 
-function drawCan(context, x, y, radius, label) {
-    context.beginPath();
-    context.arc(x, y, radius, 0, 2 * Math.PI, false);
-    context.fillStyle = 'silver';
-    context.fill();
+function drawCan(canLayer, x, y, radius, label) {
+    var circle = new Kinetic.Circle({
+        x: x,
+        y: y,
+        radius: radius,
+        fill: 'silver',
+        stroke: 'grey',
+        strokeWidth: 1
+    });
+    canLayer.add(circle);
 
-    context.lineWidth = 1;
-    context.strokeStyle = 'grey';
-    context.stroke();
-
-    context.fillStyle = 'black';
-    context.font= 1 * inchesToPx + "px Arial";
-    context.textAlign="center";
-    context.textBaseline="middle";
-    context.fillText(label, x, y);
+    var labelText = new Kinetic.Text({
+        x: x,
+        y: y,
+        text: label,
+        fontSize: 1 * inchesToPx,
+        fontFamily: 'Arial',
+        fill: 'black',
+    });
+    labelText.setOffset({
+        x: labelText.getWidth() / 2,
+        y: labelText.getHeight() / 2
+    });
+    canLayer.add(labelText);
 }
 
-function drawCans(context, x, y, canType, canCount) {
+function drawCans(stage, x, y, canType, canCount) {
     var canRadius = canTypeToInches(canType) / 2;
     var canRenderRadius = canRadius * inchesToPx;
     var circleRenderRadius = centerToCanCenter(canRadius, canCount) * inchesToPx;
 
+    var canLayer = new Kinetic.Layer();
     for (angle = 0; angle < (2 * Math.PI); angle += (2 * Math.PI / canCount)) {
         drawCan(
-            context,
+            canLayer,
             x + circleRenderRadius * Math.sin(angle),
             y + circleRenderRadius * Math.cos(angle),
             canRenderRadius,
             '#' + canType);
     }
+    stage.add(canLayer);
 }
 
-function handleCanDrawing(canvas) {
-    if (canvas.getContext) {
-        var context = canvas.getContext('2d');
+var stage = new Kinetic.Stage({
+    container: 'canCalcContainer',
+    width: window.innerWidth,
+    height: 300
+});
 
-        var centerX = 12 * inchesToPx;
-        var centerY = canvas.height / 2;
 
-        window.addEventListener('resize', resizeCanvas, false);
+var centerX = 12 * inchesToPx;
+var centerY = stage.getHeight() / 2;
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            drawCans(context, centerX, centerY, "300", 16); 
-        }
-
-        resizeCanvas();
-    }
-}
-
-function renderCanCalc()
-{
-    $(function() {
-        handleCanDrawing(document.getElementById('canCalcCanvas'));
-    });
-};
+drawCans(
+    stage,
+    12 * inchesToPx,
+    stage.getHeight() / 2,
+    "300",
+    16
+); 
