@@ -18,16 +18,29 @@ function canstructionDiameter(canType, count)
     return 2 * (centerToCanCenter(radius, count) + radius);
 }
 
-function drawCan(canLayer, x, y, radius, label) {
+function drawCan(canLayer, shadowLayer, x, y, radius, label) {
     var circle = new Kinetic.Circle({
         x: x,
         y: y,
         radius: radius,
         fill: 'silver',
         stroke: 'grey',
-        strokeWidth: 1
+        strokeWidth: 1,
     });
     canLayer.add(circle);
+
+    var shadow = new Kinetic.Circle({
+        x: x,
+        y: y,
+        radius: radius,
+        fill: 'silver',
+        stroke: 'none',
+        shadowColor: 'black',
+        shadowOffset: 0.05 * inchesToPx * radius,
+        shadowOpacity: 0.5,
+        shadowBlur: 30,
+    });
+    shadowLayer.add(shadow);
 
     var labelText = new Kinetic.Text({
         x: x,
@@ -50,14 +63,17 @@ function drawCans(stage, x, y, canType, canCount) {
     var circleRenderRadius = centerToCanCenter(canRadius, canCount) * inchesToPx;
 
     var canLayer = new Kinetic.Layer();
+    var shadowLayer = new Kinetic.Layer();
     for (angle = 0; angle < (2 * Math.PI); angle += (2 * Math.PI / canCount)) {
         drawCan(
             canLayer,
+            shadowLayer,
             x + circleRenderRadius * Math.sin(angle),
             y + circleRenderRadius * Math.cos(angle),
             canRenderRadius,
             '#' + canType);
     }
+    stage.add(shadowLayer);
     stage.add(canLayer);
 }
 
