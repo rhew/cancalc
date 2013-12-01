@@ -65,11 +65,12 @@ function drawCans(stage, x, y, canType, canCount) {
     var canLayer = new Kinetic.Layer();
     var shadowLayer = new Kinetic.Layer();
     for (angle = 0; angle < (2 * Math.PI); angle += (2 * Math.PI / canCount)) {
+        renderAngle = angle + Math.PI / 2;
         drawCan(
             canLayer,
             shadowLayer,
-            x + circleRenderRadius * Math.sin(angle),
-            y + circleRenderRadius * Math.cos(angle),
+            x + circleRenderRadius * Math.sin(renderAngle),
+            y + circleRenderRadius * Math.cos(renderAngle),
             canRenderRadius,
             '#' + canType);
     }
