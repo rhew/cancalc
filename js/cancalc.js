@@ -18,7 +18,7 @@ function canstructionDiameter(canType, count)
     return 2 * (centerToCanCenter(radius, count) + radius);
 }
 
-function drawCan(canLayer, shadowLayer, x, y, radius, label) {
+function drawCan(canLayer, shadowLayer, draggableLayer, x, y, radius, label, draggable) {
     var circle = new Kinetic.Circle({
         x: x,
         y: y,
@@ -27,7 +27,6 @@ function drawCan(canLayer, shadowLayer, x, y, radius, label) {
         stroke: 'grey',
         strokeWidth: 1,
     });
-    canLayer.add(circle);
 
     var shadow = new Kinetic.Circle({
         x: x,
@@ -40,7 +39,6 @@ function drawCan(canLayer, shadowLayer, x, y, radius, label) {
         shadowOpacity: 0.5,
         shadowBlur: 30,
     });
-    shadowLayer.add(shadow);
 
     var labelText = new Kinetic.Text({
         x: x,
@@ -54,7 +52,20 @@ function drawCan(canLayer, shadowLayer, x, y, radius, label) {
         x: labelText.getWidth() / 2,
         y: labelText.getHeight() / 2
     });
-    canLayer.add(labelText);
+
+    if (draggable) {
+        var group = new Kinetic.Group({
+            draggable: true
+        });
+        group.add(shadow);
+        group.add(circle);
+        group.add(labelText);
+        draggableLayer.add(group);
+    } else {
+        shadowLayer.add(shadow);
+        canLayer.add(circle);
+        canLayer.add(labelText);
+    }
 }
 
 function drawCans(stage, x, y, canType, canCount) {
@@ -64,18 +75,23 @@ function drawCans(stage, x, y, canType, canCount) {
 
     var canLayer = new Kinetic.Layer();
     var shadowLayer = new Kinetic.Layer();
+    var draggableLayer = new Kinetic.Layer();
     for (angle = 0; angle < (2 * Math.PI); angle += (2 * Math.PI / canCount)) {
         renderAngle = angle + Math.PI / 2;
         drawCan(
             canLayer,
             shadowLayer,
+            draggableLayer,
             x + circleRenderRadius * Math.sin(renderAngle),
             y + circleRenderRadius * Math.cos(renderAngle),
             canRenderRadius,
-            '#' + canType);
+            '#' + canType,
+            0 === angle // make the first can draggable
+        );
     }
     stage.add(shadowLayer);
     stage.add(canLayer);
+    stage.add(draggableLayer);
 }
 
 var stage = new Kinetic.Stage({
