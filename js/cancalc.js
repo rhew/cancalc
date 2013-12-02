@@ -1,4 +1,7 @@
 var inchesToPx = 10;
+var MIN_CAN_COUNT = 3;
+var MAX_CAN_COUNT = 100;
+var CAN_TYPE = '300';
 
 var stage = new Kinetic.Stage({
     container: 'canCalcContainer',
@@ -22,11 +25,13 @@ var ruler = new Kinetic.Line({
 dynamicLayer.add(ruler);
 stage.add(dynamicLayer);
 
+var canDataSets = buildCanDataSets([CAN_TYPE]);
+
 drawCans(
     stage,
     12 * inchesToPx,
     stage.getHeight() / 2,
-    "300",
+    CAN_TYPE,
     16
 ); 
 
@@ -43,12 +48,43 @@ function centerToCanCenter(canRadius, count) {
         * 2 * canRadius / Math.sin(2 * Math.PI / count);
 }
 
-function canstructionDiameter(canType, count)
-{
-    radius = canTypeToInches(canType) / 2;
-    return 2 * (centerToCanCenter(radius, count) + radius);
+function buildCanDataSets(canTypes) {
+    var canDataSets = [];
+    $.each(canTypes, function(dummyIndex, canType) {
+        canDataSets[canType] = [];
+        for (var i = MIN_CAN_COUNT; i<=MAX_CAN_COUNT; i++) {
+            canDataSets[canType][i] = centerToCanCenter(
+                canTypeToInches(canType) / 2,
+                i
+            ).toFixed(1);
+        }
+    });
+    return canDataSets;
 }
 
+function findClosestRadiusCanCount(proposedRadius, canType) {
+    canTypeDataSet = canDataSets[canType];
+    var newCanCount = MAX_CAN_COUNT;
+    $.each(canTypeDataSet, function(canCount, diameter) {
+        if (proposedRadius < diameter) {
+            newCanCount = canCount;
+            return false;
+        }
+    });
+    return newCanCount;
+}
+
+
+// TODO: ruler.prototype
+function getRulerMeasurement() {
+    var points = ruler.getPoints();
+    var a = points[0].x - points[1].x;
+    var b = points[0].y - points[1].y;
+    
+    return Math.sqrt(a * a + b * b) / inchesToPx;
+}
+
+// TODO: ruler.prototype
 function moveRulerEndPoint(x, y) {
     var points = ruler.getPoints();
     ruler.setPoints([
@@ -115,8 +151,8 @@ function drawCan(canLayer, shadowLayer, dynamicLayer, x, y, radius, label, dragg
                 stage,
                 12 * inchesToPx,
                 stage.getHeight() / 2,
-                "300",
-                25
+                CAN_TYPE,
+                findClosestRadiusCanCount(getRulerMeasurement(), CAN_TYPE)
             ); 
         });
 
