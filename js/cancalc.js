@@ -1,12 +1,12 @@
 var inchesToPx = 10;
 var MIN_CAN_COUNT = 3;
-var MAX_CAN_COUNT = 100;
+var MAX_CAN_COUNT = 200;
 var CAN_TYPE = '300';
 
 var stage = new Kinetic.Stage({
     container: 'canCalcContainer',
     width: window.innerWidth,
-    height: 300
+    height: window.innerHeight
 });
 var canLayer = new Kinetic.Layer();
 var shadowLayer = new Kinetic.Layer();
