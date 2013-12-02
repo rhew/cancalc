@@ -170,8 +170,8 @@ function drawInfoBox(canType, canCount, rulerMeasurement) {
         x: 10,
         y: 10,
         text:
-            'Can type: #' + canType +
-            '\nCan count: ' + canCount +
+            'can type: #' + canType +
+            '\ncan count: ' + canCount +
             '\nruler: ' + rulerMeasurement.toFixed(1) + '"' +
             '\noverall diameter: ' +
                 (rulerMeasurement * 2 + canTypeToInches(canType)).toFixed(1) + '"',
