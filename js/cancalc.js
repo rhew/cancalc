@@ -11,6 +11,7 @@ var stage = new Kinetic.Stage({
 var canLayer = new Kinetic.Layer();
 var shadowLayer = new Kinetic.Layer();
 var dynamicLayer = new Kinetic.Layer();
+var infoLayer = new Kinetic.Layer();
 
 var centerX = 12 * inchesToPx;
 var centerY = stage.getHeight() / 2;
@@ -27,7 +28,7 @@ stage.add(dynamicLayer);
 
 var canDataSets = buildCanDataSets([CAN_TYPE]);
 
-drawCans(
+drawScreen(
     stage,
     12 * inchesToPx,
     stage.getHeight() / 2,
@@ -147,7 +148,7 @@ function drawCan(canLayer, shadowLayer, dynamicLayer, x, y, radius, label, dragg
             );
         });
         group.on('dragend', function() {
-            drawCans(
+            drawScreen(
                 stage,
                 12 * inchesToPx,
                 stage.getHeight() / 2,
@@ -164,7 +165,44 @@ function drawCan(canLayer, shadowLayer, dynamicLayer, x, y, radius, label, dragg
     }
 }
 
-function drawCans(stage, x, y, canType, canCount) {
+function drawInfoBox(canType, canCount, rulerMeasurement) {
+    var text = new Kinetic.Text({
+        x: 10,
+        y: 10,
+        text:
+            'Can type: #' + canType +
+            '\nCan count: ' + canCount +
+            '\nruler: ' + rulerMeasurement.toFixed(1) + '"' +
+            '\noverall diameter: ' +
+                (rulerMeasurement * 2 + canTypeToInches(canType)).toFixed(1) + '"',
+        fontSize: 14,
+        fontFamily: 'Arial',
+        fill: '#555',
+        width: 180,
+        padding: 10,
+        align: 'left'
+    });
+
+    var rectangle = new Kinetic.Rect({
+        x: 10,
+        y: 10,
+        stroke: '#555',
+        strokeWidth: 5,
+        fill: '#ddd',
+        width: 180,
+        height: text.getHeight(),
+        shadowColor: 'black',
+        shadowBlur: 10,
+        shadowOffset: [10, 10],
+        shadowOpacity: 0.2,
+        cornerRadius: 10
+    });
+
+    infoLayer.add(rectangle);
+    infoLayer.add(text);
+}
+
+function drawScreen(stage, x, y, canType, canCount) {
     var canRadius = canTypeToInches(canType) / 2;
     var canRenderRadius = canRadius * inchesToPx;
     var circleRenderRadius = centerToCanCenter(canRadius, canCount) * inchesToPx;
@@ -176,8 +214,11 @@ function drawCans(stage, x, y, canType, canCount) {
     if (draggableCanGroups[0]) {
         draggableCanGroups[0].destroy();
     }
+    infoLayer.destroyChildren();
 
     moveRulerEndPoint(centerX + circleRenderRadius, centerY);
+
+    drawInfoBox(canType, canCount, getRulerMeasurement());
 
     for (angle = 0; angle < (2 * Math.PI); angle += (2 * Math.PI / canCount)) {
         renderAngle = angle + Math.PI / 2;
@@ -195,5 +236,6 @@ function drawCans(stage, x, y, canType, canCount) {
     stage.add(shadowLayer);
     stage.add(canLayer);
     stage.add(dynamicLayer);
+    stage.add(infoLayer);
 }
 
