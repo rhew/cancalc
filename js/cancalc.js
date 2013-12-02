@@ -49,6 +49,17 @@ function canstructionDiameter(canType, count)
     return 2 * (centerToCanCenter(radius, count) + radius);
 }
 
+function moveRulerEndPoint(x, y) {
+    var points = ruler.getPoints();
+    ruler.setPoints([
+        points[0].x,
+        points[0].y, 
+        x,
+        y
+    ]);
+    ruler.getLayer().draw();
+}
+
 function drawCan(canLayer, shadowLayer, dynamicLayer, x, y, radius, label, draggable) {
     var circle = new Kinetic.Circle({
         x: x,
@@ -94,14 +105,19 @@ function drawCan(canLayer, shadowLayer, dynamicLayer, x, y, radius, label, dragg
 
         group.on('dragmove', function() {
             var circles = group.find('Circle');
-            var points = ruler.getPoints();
-            ruler.setPoints([
-                points[0].x,
-                points[0].y, 
+            moveRulerEndPoint(
                 circles[0].getX() + group.getX(),
                 circles[0].getY() + group.getY()
-            ]);
-            ruler.getLayer().draw();
+            );
+        });
+        group.on('dragend', function() {
+            drawCans(
+                stage,
+                12 * inchesToPx,
+                stage.getHeight() / 2,
+                "300",
+                25
+            ); 
         });
 
         dynamicLayer.add(group);
@@ -116,6 +132,16 @@ function drawCans(stage, x, y, canType, canCount) {
     var canRadius = canTypeToInches(canType) / 2;
     var canRenderRadius = canRadius * inchesToPx;
     var circleRenderRadius = centerToCanCenter(canRadius, canCount) * inchesToPx;
+
+    shadowLayer.destroyChildren();
+    canLayer.destroyChildren();
+    // delete the draggable can if it's there, leave the ruler
+    var draggableCanGroups = dynamicLayer.find('Group');
+    if (draggableCanGroups[0]) {
+        draggableCanGroups[0].destroy();
+    }
+
+    moveRulerEndPoint(centerX + circleRenderRadius, centerY);
 
     for (angle = 0; angle < (2 * Math.PI); angle += (2 * Math.PI / canCount)) {
         renderAngle = angle + Math.PI / 2;
