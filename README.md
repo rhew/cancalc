@@ -13,3 +13,5 @@ cancalc is the source for a web page that displays measurements to expect if you
 - bower install
 - build [kineticjs](https://github.com/ericdrowell/KineticJS)
 - point a web browser at cancalc.html
+
+## [Try it](https://rhew.org/cancalc/)
