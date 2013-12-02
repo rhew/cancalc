@@ -1,5 +1,36 @@
 var inchesToPx = 10;
 
+var stage = new Kinetic.Stage({
+    container: 'canCalcContainer',
+    width: window.innerWidth,
+    height: 300
+});
+var canLayer = new Kinetic.Layer();
+var shadowLayer = new Kinetic.Layer();
+var dynamicLayer = new Kinetic.Layer();
+
+var centerX = 12 * inchesToPx;
+var centerY = stage.getHeight() / 2;
+
+var ruler = new Kinetic.Line({
+    points: [centerX, centerY, centerX, centerY],
+    stroke: 'green',
+    dashArray: [11 * inchesToPx, 1 * inchesToPx],
+    strokeWidth: 1
+});
+
+dynamicLayer.add(ruler);
+stage.add(dynamicLayer);
+
+drawCans(
+    stage,
+    12 * inchesToPx,
+    stage.getHeight() / 2,
+    "300",
+    16
+); 
+
+
 function canTypeToInches(canType)
 {
     var inches = Number(canType.substring(0,1));
@@ -18,7 +49,7 @@ function canstructionDiameter(canType, count)
     return 2 * (centerToCanCenter(radius, count) + radius);
 }
 
-function drawCan(canLayer, shadowLayer, draggableLayer, x, y, radius, label, draggable) {
+function drawCan(canLayer, shadowLayer, dynamicLayer, x, y, radius, label, draggable) {
     var circle = new Kinetic.Circle({
         x: x,
         y: y,
@@ -60,7 +91,20 @@ function drawCan(canLayer, shadowLayer, draggableLayer, x, y, radius, label, dra
         group.add(shadow);
         group.add(circle);
         group.add(labelText);
-        draggableLayer.add(group);
+
+        group.on('dragmove', function() {
+            var circles = group.find('Circle');
+            var points = ruler.getPoints();
+            ruler.setPoints([
+                points[0].x,
+                points[0].y, 
+                circles[0].getX() + group.getX(),
+                circles[0].getY() + group.getY()
+            ]);
+            ruler.getLayer().draw();
+        });
+
+        dynamicLayer.add(group);
     } else {
         shadowLayer.add(shadow);
         canLayer.add(circle);
@@ -73,15 +117,12 @@ function drawCans(stage, x, y, canType, canCount) {
     var canRenderRadius = canRadius * inchesToPx;
     var circleRenderRadius = centerToCanCenter(canRadius, canCount) * inchesToPx;
 
-    var canLayer = new Kinetic.Layer();
-    var shadowLayer = new Kinetic.Layer();
-    var draggableLayer = new Kinetic.Layer();
     for (angle = 0; angle < (2 * Math.PI); angle += (2 * Math.PI / canCount)) {
         renderAngle = angle + Math.PI / 2;
         drawCan(
             canLayer,
             shadowLayer,
-            draggableLayer,
+            dynamicLayer,
             x + circleRenderRadius * Math.sin(renderAngle),
             y + circleRenderRadius * Math.cos(renderAngle),
             canRenderRadius,
@@ -91,23 +132,6 @@ function drawCans(stage, x, y, canType, canCount) {
     }
     stage.add(shadowLayer);
     stage.add(canLayer);
-    stage.add(draggableLayer);
+    stage.add(dynamicLayer);
 }
 
-var stage = new Kinetic.Stage({
-    container: 'canCalcContainer',
-    width: window.innerWidth,
-    height: 300
-});
-
-
-var centerX = 12 * inchesToPx;
-var centerY = stage.getHeight() / 2;
-
-drawCans(
-    stage,
-    12 * inchesToPx,
-    stage.getHeight() / 2,
-    "300",
-    16
-); 
