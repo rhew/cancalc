@@ -23,7 +23,22 @@ var ruler = new Kinetic.Line({
     strokeWidth: 1
 });
 
+rulerLabel = '0.0"';
+var rulerDisplay = new Kinetic.Text({
+    x: centerX,
+    y: centerY,
+    text: rulerLabel,
+    fontSize: 5 * inchesToPx,
+    fontFamily: 'Arial',
+    fill: 'red',
+});
+rulerDisplay.setOffset({
+    x: rulerDisplay.getWidth() / 2,
+    y: rulerDisplay.getHeight() / 2
+});
+
 dynamicLayer.add(ruler);
+dynamicLayer.add(rulerDisplay);
 stage.add(dynamicLayer);
 
 var canDataSets = buildCanDataSets([CAN_TYPE]);
@@ -94,6 +109,12 @@ function moveRulerEndPoint(x, y) {
         x,
         y
     ]);
+    rulerDisplay.setText(getRulerMeasurement().toFixed(1) + '"');
+    rulerDisplay.setOffset({
+        x: rulerDisplay.getWidth() / 2,
+        y: rulerDisplay.getHeight() / 2
+    });
+
     ruler.getLayer().draw();
 }
 
