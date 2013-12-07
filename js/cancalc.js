@@ -44,19 +44,38 @@ var canCalc = (function () {
 
     var canDataSets = buildCanDataSets([CAN_TYPE]);
 
-    var canImage = new Image();
-    canImage.src = 'media/can.png'
+    var sources = {
+        can: 'media/can.png',
+        floor: 'media/floor.jpg',
+    };
 
-    canImage.onload = function() {
-        drawScreen(
-            stage,
-            12 * inchesToPx,
-            stage.getHeight() / 2,
-            CAN_TYPE,
-            16
-        ); 
-   };
+    imageLoader(sources, 
+        function(images) {
+            drawScreen(
+                images,
+                stage,
+                12 * inchesToPx,
+                stage.getHeight() / 2,
+                CAN_TYPE,
+                16
+            );
+    });
 
+    function imageLoader(sourceList, callback) {
+        var imageList = {};
+        var numLoaded = 0;
+
+        Object.keys(sourceList).forEach(function (key) {
+            imageList[key] = new Image();
+            imageList[key].onload = function() {
+                numLoaded++;
+                if (numLoaded >= Object.keys(sourceList).length) {
+                    callback(imageList);
+                }
+            };
+            imageList[key].src = sourceList[key];
+        });
+    }
 
     function canTypeToInches(canType)
     {
@@ -124,13 +143,13 @@ var canCalc = (function () {
         ruler.getLayer().draw();
     }
 
-    function drawCan(canLayer, shadowLayer, dynamicLayer, x, y, radius, draggable) {
+    function drawCan(images, canLayer, shadowLayer, dynamicLayer, x, y, radius, draggable) {
         var circle = new Kinetic.Circle({
             radius: radius,
             drawFunc: function() {
                 var context = this.getContext();
                 context.drawImage(
-                    canImage,
+                    images['can'],
                     x - radius,
                     y - radius,
                     2 * radius,
@@ -168,6 +187,7 @@ var canCalc = (function () {
             });
             group.on('dragend', function() {
                 drawScreen(
+                    images,
                     stage,
                     12 * inchesToPx,
                     stage.getHeight() / 2,
@@ -220,7 +240,7 @@ var canCalc = (function () {
         infoLayer.add(text);
     }
 
-    function drawScreen(stage, x, y, canType, canCount) {
+    function drawScreen(images, stage, x, y, canType, canCount) {
         var canRadius = canTypeToInches(canType) / 2;
         var canRenderRadius = canRadius * inchesToPx;
         var circleRenderRadius = centerToCanCenter(canRadius, canCount) * inchesToPx;
@@ -241,6 +261,7 @@ var canCalc = (function () {
         for (angle = 0; angle < (2 * Math.PI); angle += (2 * Math.PI / canCount)) {
             renderAngle = angle + Math.PI / 2;
             drawCan(
+                images,
                 canLayer,
                 shadowLayer,
                 dynamicLayer,
