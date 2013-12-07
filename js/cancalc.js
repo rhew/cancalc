@@ -44,13 +44,18 @@ var canCalc = (function () {
 
     var canDataSets = buildCanDataSets([CAN_TYPE]);
 
-    drawScreen(
-        stage,
-        12 * inchesToPx,
-        stage.getHeight() / 2,
-        CAN_TYPE,
-        16
-    ); 
+    var canImage = new Image();
+    canImage.src = 'media/can.png'
+
+    canImage.onload = function() {
+        drawScreen(
+            stage,
+            12 * inchesToPx,
+            stage.getHeight() / 2,
+            CAN_TYPE,
+            16
+        ); 
+   };
 
 
     function canTypeToInches(canType)
@@ -119,14 +124,19 @@ var canCalc = (function () {
         ruler.getLayer().draw();
     }
 
-    function drawCan(canLayer, shadowLayer, dynamicLayer, x, y, radius, label, draggable) {
+    function drawCan(canLayer, shadowLayer, dynamicLayer, x, y, radius, draggable) {
         var circle = new Kinetic.Circle({
-            x: x,
-            y: y,
             radius: radius,
-            fill: 'silver',
-            stroke: 'grey',
-            strokeWidth: 1,
+            drawFunc: function() {
+                var context = this.getContext();
+                context.drawImage(
+                    canImage,
+                    x - radius,
+                    y - radius,
+                    2 * radius,
+                    2 * radius
+                );
+            },
         });
 
         var shadow = new Kinetic.Circle({
@@ -141,26 +151,13 @@ var canCalc = (function () {
             shadowBlur: 30,
         });
 
-        var labelText = new Kinetic.Text({
-            x: x,
-            y: y,
-            text: label,
-            fontSize: 1 * inchesToPx,
-            fontFamily: 'Arial',
-            fill: 'black',
-        });
-        labelText.setOffset({
-            x: labelText.getWidth() / 2,
-            y: labelText.getHeight() / 2
-        });
-
         if (draggable) {
             var group = new Kinetic.Group({
                 draggable: true
             });
             group.add(shadow);
             group.add(circle);
-            group.add(labelText);
+
 
             group.on('dragmove', function() {
                 var circles = group.find('Circle');
@@ -183,7 +180,6 @@ var canCalc = (function () {
         } else {
             shadowLayer.add(shadow);
             canLayer.add(circle);
-            canLayer.add(labelText);
         }
     }
 
@@ -251,7 +247,6 @@ var canCalc = (function () {
                 x + circleRenderRadius * Math.sin(renderAngle),
                 y + circleRenderRadius * Math.cos(renderAngle),
                 canRenderRadius,
-                '#' + canType,
                 0 === angle // make the first can draggable
             );
         }
