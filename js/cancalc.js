@@ -9,6 +9,7 @@ var canCalc = (function () {
         width: window.innerWidth,
         height: window.innerHeight
     });
+    var floorLayer = new Kinetic.Layer();
     var canLayer = new Kinetic.Layer();
     var shadowLayer = new Kinetic.Layer();
     var dynamicLayer = new Kinetic.Layer();
@@ -31,7 +32,7 @@ var canCalc = (function () {
         text: rulerLabel,
         fontSize: 5 * inchesToPx,
         fontFamily: 'Arial',
-        fill: 'red',
+        fill: 'darkred',
     });
     rulerDisplay.setOffset({
         x: rulerDisplay.getWidth() / 2,
@@ -46,7 +47,7 @@ var canCalc = (function () {
 
     var sources = {
         can: 'media/can.png',
-        floor: 'media/floor.jpg',
+        floor: 'media/floor.png',
     };
 
     imageLoader(sources, 
@@ -241,6 +242,16 @@ var canCalc = (function () {
     }
 
     function drawScreen(images, stage, x, y, canType, canCount) {
+        var floorRect = new Kinetic.Rect({
+            x: 0,
+            y: 0,
+            height: stage.getHeight(),
+            width: stage.getWidth(),
+            fillPatternRepeat: 'repeat',
+            fillPatternImage: images['floor'],
+        });
+        floorLayer.add(floorRect);
+
         var canRadius = canTypeToInches(canType) / 2;
         var canRenderRadius = canRadius * inchesToPx;
         var circleRenderRadius = centerToCanCenter(canRadius, canCount) * inchesToPx;
@@ -271,6 +282,7 @@ var canCalc = (function () {
                 0 === angle // make the first can draggable
             );
         }
+        stage.add(floorLayer);
         stage.add(shadowLayer);
         stage.add(canLayer);
         stage.add(dynamicLayer);
