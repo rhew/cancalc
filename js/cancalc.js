@@ -18,29 +18,52 @@ var canCalc = (function () {
     var centerX = 12 * inchesToPx;
     var centerY = stage.getHeight() / 2;
 
-    var ruler = new Kinetic.Line({
-        points: [centerX, centerY, centerX, centerY],
-        stroke: 'green',
-        dashArray: [11 * inchesToPx, 1 * inchesToPx],
-        strokeWidth: 1
+    var ruler = {
+        line: new Kinetic.Line({
+            points: [centerX, centerY, centerX, centerY],
+            stroke: 'green',
+            dashArray: [11 * inchesToPx, 1 * inchesToPx],
+            strokeWidth: 1
+        }),
+        text: new Kinetic.Text({
+            x: centerX,
+            y: centerY,
+            text: '0.0"',
+            fontSize: 5 * inchesToPx,
+            fontFamily: 'Arial',
+            fill: 'darkred',
+        }),
+        getMeasurement: function() {
+            var points = this.line.getPoints();
+            var a = points[0].x - points[1].x;
+            var b = points[0].y - points[1].y;
+            
+            return Math.sqrt(a * a + b * b) / inchesToPx;
+        },
+        moveEndPoint: function(x, y) {
+            var points = this.line.getPoints();
+            this.line.setPoints([
+                points[0].x,
+                points[0].y, 
+                x,
+                y
+            ]);
+            this.text.setText(this.getMeasurement().toFixed(1) + '"');
+            this.text.setOffset({
+                x: this.text.getWidth() / 2,
+                y: this.text.getHeight() / 2
+            });
+
+            this.line.getLayer().draw();
+        }
+    };
+    ruler.text.setOffset({
+        x: ruler.text.getWidth() / 2,
+        y: ruler.text.getHeight() / 2
     });
 
-    rulerLabel = '0.0"';
-    var rulerDisplay = new Kinetic.Text({
-        x: centerX,
-        y: centerY,
-        text: rulerLabel,
-        fontSize: 5 * inchesToPx,
-        fontFamily: 'Arial',
-        fill: 'darkred',
-    });
-    rulerDisplay.setOffset({
-        x: rulerDisplay.getWidth() / 2,
-        y: rulerDisplay.getHeight() / 2
-    });
-
-    dynamicLayer.add(ruler);
-    dynamicLayer.add(rulerDisplay);
+    dynamicLayer.add(ruler.line);
+    dynamicLayer.add(ruler.text);
     stage.add(dynamicLayer);
 
     var canDataSets = buildCanDataSets([CAN_TYPE]);
@@ -119,34 +142,6 @@ var canCalc = (function () {
         return newCanCount;
     }
 
-
-    // TODO: ruler.prototype
-    function getRulerMeasurement() {
-        var points = ruler.getPoints();
-        var a = points[0].x - points[1].x;
-        var b = points[0].y - points[1].y;
-        
-        return Math.sqrt(a * a + b * b) / inchesToPx;
-    }
-
-    // TODO: ruler.prototype
-    function moveRulerEndPoint(x, y) {
-        var points = ruler.getPoints();
-        ruler.setPoints([
-            points[0].x,
-            points[0].y, 
-            x,
-            y
-        ]);
-        rulerDisplay.setText(getRulerMeasurement().toFixed(1) + '"');
-        rulerDisplay.setOffset({
-            x: rulerDisplay.getWidth() / 2,
-            y: rulerDisplay.getHeight() / 2
-        });
-
-        ruler.getLayer().draw();
-    }
-
     function drawCan(images, canLayer, shadowLayer, dynamicLayer, x, y, radius, draggable) {
         var circle = new Kinetic.Circle({
             radius: radius,
@@ -184,7 +179,7 @@ var canCalc = (function () {
 
             group.on('dragmove', function() {
                 var circles = group.find('Circle');
-                moveRulerEndPoint(
+                ruler.moveEndPoint(
                     circles[0].getX() + group.getX(),
                     circles[0].getY() + group.getY()
                 );
@@ -196,7 +191,7 @@ var canCalc = (function () {
                     12 * inchesToPx,
                     stage.getHeight() / 2,
                     CAN_TYPE,
-                    findClosestRadiusCanCount(getRulerMeasurement(), CAN_TYPE),
+                    findClosestRadiusCanCount(ruler.getMeasurement(), CAN_TYPE),
                     true
                 ); 
             });
@@ -273,9 +268,9 @@ var canCalc = (function () {
         }
         infoLayer.destroyChildren();
 
-        moveRulerEndPoint(centerX + circleRenderRadius, centerY);
+        ruler.moveEndPoint(centerX + circleRenderRadius, centerY);
 
-        drawInfoBox(canType, canCount, getRulerMeasurement());
+        drawInfoBox(canType, canCount, ruler.getMeasurement());
 
         for (angle = 0; angle < (2 * Math.PI); angle += (2 * Math.PI / canCount)) {
             renderAngle = angle + Math.PI / 2;
