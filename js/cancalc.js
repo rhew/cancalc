@@ -216,7 +216,7 @@ var canCalc = (function () {
                     (rulerMeasurement * 2 + canTypeToInches(canType)).toFixed(1) + '"',
             fontSize: 14,
             fontFamily: 'Arial',
-            fill: '#555',
+            fill: 'darkred',
             width: 180,
             padding: 10,
             align: 'left'
@@ -234,6 +234,7 @@ var canCalc = (function () {
             shadowBlur: 10,
             shadowOffset: [10, 10],
             shadowOpacity: 0.2,
+            opacity: 0.5,
             cornerRadius: 10
         });
 
