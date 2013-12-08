@@ -60,7 +60,8 @@ var canCalc = (function () {
                 12 * inchesToPx,
                 stage.getHeight() / 2,
                 CAN_TYPE,
-                16
+                16,
+                false
             );
     });
 
@@ -189,14 +190,14 @@ var canCalc = (function () {
                 );
             });
             group.on('dragend', function() {
-                dropSound.play();
                 drawScreen(
                     images,
                     stage,
                     12 * inchesToPx,
                     stage.getHeight() / 2,
                     CAN_TYPE,
-                    findClosestRadiusCanCount(getRulerMeasurement(), CAN_TYPE)
+                    findClosestRadiusCanCount(getRulerMeasurement(), CAN_TYPE),
+                    true
                 ); 
             });
 
@@ -245,7 +246,10 @@ var canCalc = (function () {
         infoLayer.add(text);
     }
 
-    function drawScreen(images, stage, x, y, canType, canCount) {
+    function drawScreen(images, stage, x, y, canType, canCount, canMoved) {
+        if (canMoved) {
+            dropSound.play();
+        }
         var floorRect = new Kinetic.Rect({
             x: 0,
             y: 0,
