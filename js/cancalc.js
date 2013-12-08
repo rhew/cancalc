@@ -45,6 +45,8 @@ var canCalc = (function () {
 
     var canDataSets = buildCanDataSets([CAN_TYPE]);
 
+    var dropSound = new Audio('media/drop1.wav');
+
     var sources = {
         can: 'media/can.png',
         floor: 'media/floor.png',
@@ -187,6 +189,7 @@ var canCalc = (function () {
                 );
             });
             group.on('dragend', function() {
+                dropSound.play();
                 drawScreen(
                     images,
                     stage,
