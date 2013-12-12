@@ -1,3 +1,21 @@
+Math.gcd = function(a, b) {
+    if (! b) {
+        return a;
+    }
+    return Math.gcd(b, a % b);
+};
+
+Math.toFractional = function(number, denominator) {
+    var whole = Math.floor(number);
+    var numerator = Math.round(denominator * (number - whole) / 1);
+    var gcd = Math.gcd(numerator, denominator);
+    return {
+        whole: whole,
+        numerator: numerator / gcd,
+        denominator: denominator / gcd
+    };
+};
+
 var canCalc = (function () {
     var inchesToPx = 10;
     var MIN_CAN_COUNT = 3;
@@ -29,7 +47,7 @@ var canCalc = (function () {
             x: centerX,
             y: centerY,
             text: '0.0"',
-            fontSize: 5 * inchesToPx,
+            fontSize: 4 * inchesToPx,
             fontFamily: 'Arial',
             fill: 'darkred',
         }),
@@ -48,7 +66,8 @@ var canCalc = (function () {
                 x,
                 y
             ]);
-            this.text.setText(this.getMeasurement().toFixed(1) + '"');
+            rulerFractional = Math.toFractional(this.getMeasurement(), 16);
+            this.text.setText(fractionalToText(rulerFractional));
             this.text.setOffset({
                 x: this.text.getWidth() / 2,
                 y: this.text.getHeight() / 2
@@ -88,6 +107,15 @@ var canCalc = (function () {
             );
     });
 
+    function fractionalToText(fractional) {
+        var text = fractional.whole;
+        if (0 !== fractional.numerator) {
+            text += ' ' + fractional.numerator + '/' + fractional.denominator
+        }
+        text += '"';
+        return text;
+    }
+
     function imageLoader(sourceList, callback) {
         var imageList = {};
         var numLoaded = 0;
@@ -124,7 +152,7 @@ var canCalc = (function () {
                 canDataSets[canType][i] = centerToCanCenter(
                     canTypeToInches(canType) / 2,
                     i
-                ).toFixed(1);
+                ).toFixed(2);
             }
         });
         return canDataSets;
@@ -204,19 +232,23 @@ var canCalc = (function () {
     }
 
     function drawInfoBox(canType, canCount, rulerMeasurement) {
+        var rulerFractional = Math.toFractional(rulerMeasurement, 16);
+        var diameterFractional = Math.toFractional(
+            rulerMeasurement * 2 + canTypeToInches(canType),
+            16
+        );
         var text = new Kinetic.Text({
             x: 10,
             y: 10,
             text:
                 'can type: #' + canType +
                 '\ncan count: ' + canCount +
-                '\nruler: ' + rulerMeasurement.toFixed(1) + '"' +
-                '\noverall diameter: ' +
-                    (rulerMeasurement * 2 + canTypeToInches(canType)).toFixed(1) + '"',
+                '\nruler: ' + fractionalToText(rulerFractional) +
+                '\nexternal diameter: ' + fractionalToText(diameterFractional),
             fontSize: 14,
             fontFamily: 'Arial',
             fill: 'darkred',
-            width: 180,
+            width: 210,
             padding: 10,
             align: 'left'
         });
@@ -227,7 +259,7 @@ var canCalc = (function () {
             stroke: '#555',
             strokeWidth: 5,
             fill: '#ddd',
-            width: 180,
+            width: 210,
             height: text.getHeight(),
             shadowColor: 'black',
             shadowBlur: 10,
