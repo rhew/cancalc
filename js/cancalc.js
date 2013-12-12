@@ -21,9 +21,9 @@ var canCalc = (function () {
     var ruler = {
         line: new Kinetic.Line({
             points: [centerX, centerY, centerX, centerY],
-            stroke: 'green',
+            stroke: 'black',
             dashArray: [11 * inchesToPx, 1 * inchesToPx],
-            strokeWidth: 1
+            strokeWidth: 3
         }),
         text: new Kinetic.Text({
             x: centerX,
