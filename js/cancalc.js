@@ -152,7 +152,7 @@ var canCalc = (function () {
                 canDataSets[canType][i] = centerToCanCenter(
                     canTypeToInches(canType) / 2,
                     i
-                ).toFixed(2);
+                );
             }
         });
         return canDataSets;
